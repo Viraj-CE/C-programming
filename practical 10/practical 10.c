@@ -13,8 +13,11 @@ void main()
     printf("\n4.     Sandwich         RS.100 ");
     printf("\n5.     French Fries     RS.80 ");
     printf("\n==================================");
+    printf("\nTo Place Order Enter : 0");
+    printf("\n==================================");
 A : printf("\nEnter The Serial No. to order :");
     scanf("%d",&order);
+    printf("==================================\n");
     switch(order)
     {
     case 1:
@@ -45,6 +48,7 @@ A : printf("\nEnter The Serial No. to order :");
         printf("Please Enter a Valid Serial No.");
     }
     goto A ;
- B:
+ B: printf("\n25CE012_Chakalashiya Viraj Pareshbhai");
+     return 0;
 
 }
