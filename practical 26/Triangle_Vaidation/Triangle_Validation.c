@@ -30,4 +30,6 @@ void main()
     printf("Enter 3rd Side (In Meters):");
     scanf("%lf",&c);//input of 3rd side
     Validation(a,b,c);//validating triangle
+    printf("\n25CE012_Chakalashiya Viraj Pareshbhai");
+
 }
