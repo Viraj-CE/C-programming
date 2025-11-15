@@ -39,4 +39,6 @@ void main()
         printf("Number Of Negative Numbers :%d\n",n);
         printf("Number Of Odd Numbers :%d\n",o);
         printf("Number Of Even Numbers :%d\n",e);
+    printf("\n25CE012_Chakalashiya Viraj Pareshbhai");
 }
+
