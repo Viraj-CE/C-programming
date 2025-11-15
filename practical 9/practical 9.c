@@ -23,5 +23,6 @@ void main()
     printf("\nDiscount(per.)        :%10.2f", DiscountR);
     printf("\nFinal Amount(Rs.)     :%10.2f",Final_Amount);
     printf("\n================================================================");
+    printf("\n25CE012_Chakalashiya Viraj Pareshbhai");
 
 }
