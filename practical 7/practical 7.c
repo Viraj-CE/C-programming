@@ -13,4 +13,5 @@ void main()
     {
         printf("Your Ticket Fare is Rs.30");
     }
+    printf("\n25CE012_Chakalashiya Viraj Pareshbhai");
 }
