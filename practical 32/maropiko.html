@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ESP32 Robot Joystick Control</title>
+    <style>
+        body {
+            background: #111;
+            color: white;
+            text-align: center;
+            font-family: Arial;
+            margin: 0;
+            padding: 0;
+        }
+
+        .root {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #522aa7, #e951be);
+
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 70px;
+            margin-bottom: 20px;
+        }
+
+        /* JOYSTICK OUTER CIRCLE */
+        #joystick {
+            width: 310px;
+            height: 310px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            position: relative;
+            margin: auto;
+            touch-action: none;
+        }
+
+        /* INNER STICK */
+        #stick {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            left: 95px;
+            /* centered: (310-120)/2 */
+            top: 95px;
+            transition: 0.1s;
+            touch-action: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="root">
+        <div class="container">
+            <h2>ESP32 Robot Car Joystick</h2>
+            <div id="joystick">
+                <div id="stick"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let keysPressed = {};
+
+        document.addEventListener("keydown", (e) => {
+            if (keysPressed[e.key]) return;  // avoid repeat firing
+            keysPressed[e.key] = true;
+
+            switch (e.key.toLowerCase()) {
+                case "w":
+                    send("/f");
+                    break;
+                case "s":
+                    send("/b");
+                    break;
+                case "a":
+                    send("/l");
+                    break;
+                case "d":
+                    send("/r");
+                    break;
+            }
+        });
+
+        document.addEventListener("keyup", (e) => {
+            delete keysPressed[e.key];
+            send("/s");  // stop robot when key released
+        })
+        /* NEW JOYSTICK VALUES */
+        let joy = document.getElementById("joystick");
+        let stick = document.getElementById("stick");
+
+        let centerX = 155;  // 310/2
+        let centerY = 155;
+        let maxDist = 110;  // allowed movement (bigger joystick, bigger radius)
+
+        function send(cmd) {
+            fetch(cmd).catch(() => { });
+        }
+
+        function handleMove(x, y) {
+            let dx = x - centerX;
+            let dy = y - centerY;
+
+            // limit distance
+            let dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist > maxDist) {
+                dx = dx * maxDist / dist;
+                dy = dy * maxDist / dist;
+            }
+
+            // move stick (center it)
+            stick.style.left = (centerX + dx - 60) + "px";  // 60 = stick radius
+            stick.style.top = (centerY + dy - 60) + "px";
+
+            // directional control
+            let absX = Math.abs(dx);
+            let absY = Math.abs(dy);
+
+            if (absY > absX) {
+                if (dy < -20) send("/f");   // forward
+                else if (dy > 20) send("/b"); // backward
+            } else {
+                if (dx < -20) send("/l");   // left
+                else if (dx > 20) send("/r"); // right
+            }
+        }
+
+        function resetStick() {
+            stick.style.left = "95px";  // center again
+            stick.style.top = "95px";
+            send("/s");
+        }
+
+        /* TOUCH EVENTS */
+        joy.addEventListener("touchmove", (e) => {
+            e.preventDefault();
+            let rect = joy.getBoundingClientRect();
+            let touch = e.touches[0];
+            let x = touch.clientX - rect.left;
+            let y = touch.clientY - rect.top;
+            handleMove(x, y);
+        });
+        joy.addEventListener("touchend", resetStick);
+
+        /* MOUSE EVENTS */
+        joy.addEventListener("mousedown", (e) => {
+            let rect = joy.getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            let y = e.clientY - rect.top;
+
+            handleMove(x, y);
+
+            function moveHandler(e2) {
+                let x = e2.clientX - rect.left;
+                let y = e2.clientY - rect.top;
+                handleMove(x, y);
+            }
+
+            function upHandler() {
+                resetStick();
+                document.removeEventListener("mousemove", moveHandler);
+                document.removeEventListener("mouseup", upHandler);
+            }
+
+            document.addEventListener("mousemove", moveHandler);
+            document.addEventListener("mouseup", upHandler);
+        });
+    </script>
+
+</body>
+
+</html>
